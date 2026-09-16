@@ -1,0 +1,26 @@
+{
+  "name": "AnagramMaster - Desafio de Anagramas",
+  "short_name": "AnagramMaster",
+  "description": "Jogo PWA offline-first para criar, decifrar e compartilhar desafios de anagramas.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#e60012",
+  "orientation": "portrait-primary",
+  "categories": ["games", "education", "puzzle"],
+  "icons": [
+    {
+      "src": "assets/icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

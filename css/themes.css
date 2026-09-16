@@ -1,0 +1,174 @@
+/* ==========================================================================
+   THEMES.CSS - SISTEMA DE DESIGN TOKENS E PALETAS VISUAIS
+   Suporte a 5 temas de alto contraste, ergonomia visual e conformidade WCAG
+   ========================================================================== */
+
+:root {
+  /* Tema Padrão: Nintendo Retro */
+  --bg-primary: #f6f7fb;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #edf0f7;
+  --border-color: #e2e8f0;
+  --border-focus: #e60012;
+  
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --text-on-accent: #ffffff;
+
+  --accent-primary: #e60012;       /* Nintendo Red */
+  --accent-primary-hover: #c4000f;
+  --accent-secondary: #0284c7;     /* Sky Blue */
+  --accent-secondary-hover: #0369a1;
+  --accent-success: #16a34a;       /* Green */
+  --accent-warning: #d97706;       /* Amber */
+  --accent-danger: #dc2626;        /* Crimson */
+
+  --tile-bg: #ffffff;
+  --tile-text: #0f172a;
+  --tile-border: #cbd5e1;
+  --tile-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --tile-active-bg: #fee2e2;
+  --tile-active-border: #e60012;
+  --tile-slot-bg: #e2e8f0;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  --modal-backdrop: rgba(15, 23, 42, 0.6);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+  --font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 1. Tema AMOLED Midnight */
+body[data-theme="amoled"] {
+  --bg-primary: #000000;
+  --bg-surface: #0f0f12;
+  --bg-surface-alt: #17171c;
+  --border-color: #272730;
+  --border-focus: #38bdf8;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-on-accent: #000000;
+
+  --accent-primary: #38bdf8;       /* Electric Cyan */
+  --accent-primary-hover: #0ea5e9;
+  --accent-secondary: #a855f7;     /* Purple */
+  --accent-secondary-hover: #9333ea;
+  --accent-success: #22c55e;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+
+  --tile-bg: #1c1c24;
+  --tile-text: #f8fafc;
+  --tile-border: #383848;
+  --tile-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --tile-active-bg: #072738;
+  --tile-active-border: #38bdf8;
+  --tile-slot-bg: #131318;
+
+  --modal-backdrop: rgba(0, 0, 0, 0.85);
+}
+
+/* 2. Tema Emerald Forest */
+body[data-theme="emerald"] {
+  --bg-primary: #064e3b;
+  --bg-surface: #065f46;
+  --bg-surface-alt: #047857;
+  --border-color: #0f766e;
+  --border-focus: #34d399;
+
+  --text-primary: #f0fdf4;
+  --text-secondary: #a7f3d0;
+  --text-muted: #6ee7b7;
+  --text-on-accent: #064e3b;
+
+  --accent-primary: #34d399;       /* Emerald Mint */
+  --accent-primary-hover: #10b981;
+  --accent-secondary: #fbbf24;     /* Warm Amber */
+  --accent-secondary-hover: #f59e0b;
+  --accent-success: #4ade80;
+  --accent-warning: #facc15;
+  --accent-danger: #f87171;
+
+  --tile-bg: #047857;
+  --tile-text: #ffffff;
+  --tile-border: #10b981;
+  --tile-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  --tile-active-bg: #065f46;
+  --tile-active-border: #34d399;
+  --tile-slot-bg: #034b36;
+
+  --modal-backdrop: rgba(2, 44, 34, 0.8);
+}
+
+/* 3. Tema Cyber Sunset */
+body[data-theme="sunset"] {
+  --bg-primary: #180d2b;
+  --bg-surface: #241442;
+  --bg-surface-alt: #311b58;
+  --border-color: #4c2c85;
+  --border-focus: #f43f5e;
+
+  --text-primary: #fff1f2;
+  --text-secondary: #fda4af;
+  --text-muted: #e11d48;
+  --text-on-accent: #ffffff;
+
+  --accent-primary: #f43f5e;       /* Rose Neon */
+  --accent-primary-hover: #e11d48;
+  --accent-secondary: #f97316;     /* Sunset Orange */
+  --accent-secondary-hover: #ea580c;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-danger: #ef4444;
+
+  --tile-bg: #351e60;
+  --tile-text: #ffffff;
+  --tile-border: #633b9e;
+  --tile-shadow: 0 4px 15px rgba(244, 63, 94, 0.25);
+  --tile-active-bg: #501d4a;
+  --tile-active-border: #f43f5e;
+  --tile-slot-bg: #1f1038;
+
+  --modal-backdrop: rgba(14, 6, 26, 0.85);
+}
+
+/* 4. Tema Clean Light */
+body[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-surface: #f8fafc;
+  --bg-surface-alt: #f1f5f9;
+  --border-color: #e2e8f0;
+  --border-focus: #2563eb;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --text-on-accent: #ffffff;
+
+  --accent-primary: #2563eb;       /* Royal Blue */
+  --accent-primary-hover: #1d4ed8;
+  --accent-secondary: #0d9488;     /* Teal */
+  --accent-secondary-hover: #0f766e;
+  --accent-success: #16a34a;
+  --accent-warning: #d97706;
+  --accent-danger: #dc2626;
+
+  --tile-bg: #ffffff;
+  --tile-text: #0f172a;
+  --tile-border: #cbd5e1;
+  --tile-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --tile-active-bg: #eff6ff;
+  --tile-active-border: #2563eb;
+  --tile-slot-bg: #e2e8f0;
+
+  --modal-backdrop: rgba(15, 23, 42, 0.5);
+}

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AnagramMaster - Jogo de quebra-cabeça e anagramas 100% offline-first com sons sintetizados, temas e compartilhamento via QR Code.">
+
+  <!-- Metadados PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e60012">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
+  <link rel="shortcut icon" href="assets/icons/icon-192x192.png" type="image/png">
+
+  <title>AnagramMaster // Desafio de Anagramas</title>
+
+  <!-- Tipografia Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Folhas de Estilo Modulares -->
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+  <!-- HEADER & BARRA DE FERRAMENTAS GLOBAL -->
+  <header class="app-header" role="banner">
+    <div class="brand-container" id="brandLogo" title="Voltar à Tela Inicial" tabindex="0" role="button">
+      <span class="brand-logo" aria-hidden="true">🧩</span>
+      <span class="brand-title">Anagram<span>Master</span></span>
+    </div>
+
+    <div class="header-actions">
+      <!-- Badge de Conectividade PWA -->
+      <div id="connectionStatusBadge" class="status-badge online" role="status" aria-live="polite">
+        <span class="status-dot"></span>
+        <span id="connectionStatusText">Online</span>
+      </div>
+
+      <!-- Seletor de Tema -->
+      <select id="themeSelect" class="theme-select" aria-label="Selecione o Tema Visual">
+        <option value="nintendo">Nintendo</option>
+        <option value="amoled">AMOLED</option>
+        <option value="emerald">Esmeralda</option>
+        <option value="sunset">Cyber Sunset</option>
+        <option value="light">Clean Light</option>
+      </select>
+
+      <!-- Botão de Alternância de Áudio (Web Audio API) -->
+      <button id="btnToggleAudio" class="btn-icon" aria-label="Alternar Efeitos Sonoros" title="Alternar Efeitos Sonoros">
+        🔊
+      </button>
+
+      <!-- Botão Instalar PWA -->
+      <button id="btnInstallPwa" class="btn-install" aria-label="Instalar Aplicativo no Dispositivo">
+        📲 Instalar
+      </button>
+    </div>
+  </header>
+
+  <!-- ÁREA DE CONTEÚDO PRINCIPAL (SPA SCREENS) -->
+  <main class="main-content" id="mainContent" role="main">
+
+    <!-- 1. TELA: HUB / MENU PRINCIPAL -->
+    <section id="hubScreen" class="screen-container" aria-labelledby="hubTitle">
+      <header class="screen-header">
+        <h1 id="hubTitle">Desafio de Anagramas</h1>
+        <p>Decifre palavras embaralhadas, dispute rankings e desafie seus amigos.</p>
+      </header>
+
+      <div class="hub-grid">
+        <!-- Card 1: Dicionário Offline -->
+        <article class="hub-card" id="hubBtnDictionary" tabindex="0" role="button">
+          <div class="hub-card-icon" aria-hidden="true">📚</div>
+          <div class="hub-card-content">
+            <h3>Modo Dicionário</h3>
+            <p>Jogue por categorias como Jogos, Geografia, Animais e Ciência.</p>
+          </div>
+        </article>
+
+        <!-- Card 2: Desafio do Dia -->
+        <article class="hub-card" id="hubBtnDaily" tabindex="0" role="button">
+          <span class="badge-daily">Diário</span>
+          <div class="hub-card-icon" aria-hidden="true">📅</div>
+          <div class="hub-card-content">
+            <h3>Palavra do Dia</h3>
+            <p>O mesmo enigma diário sincronizado para todos os jogadores.</p>
+          </div>
+        </article>
+
+        <!-- Card 3: Criador de Desafio -->
+        <article class="hub-card" id="hubBtnCreator" tabindex="0" role="button">
+          <div class="hub-card-icon" aria-hidden="true">✏️</div>
+          <div class="hub-card-content">
+            <h3>Criar Desafio</h3>
+            <p>Crie seu próprio anagrama e compartilhe via Link e QR Code.</p>
+          </div>
+        </article>
+
+        <!-- Card 4: Ranking -->
+        <article class="hub-card" id="hubBtnRanking" tabindex="0" role="button">
+          <div class="hub-card-icon" aria-hidden="true">🏆</div>
+          <div class="hub-card-content">
+            <h3>Mural de Líderes</h3>
+            <p>Confira as maiores pontuações registradas no dispositivo.</p>
+          </div>
+        </article>
+      </div>
+
+      <!-- Preview Rápido de Ranking -->
+      <section class="ranking-container">
+        <h2 style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 8px;">Top Pontuações</h2>
+        <ul id="hubRankingList" class="ranking-list" aria-label="Melhores pontuações recentes"></ul>
+      </section>
+    </section>
+
+    <!-- 2. TELA: SELEÇÃO DE CATEGORIAS -->
+    <section id="categoryScreen" class="screen-container hidden" aria-labelledby="categoryTitle">
+      <header class="screen-header">
+        <h1 id="categoryTitle">Escolha uma Categoria</h1>
+        <p>Selecione um dos temas abaixo para iniciar uma partida do Dicionário.</p>
+      </header>
+
+      <div class="categories-grid">
+        <button class="category-btn" data-category="games">
+          <span class="category-icon" aria-hidden="true">🎮</span>
+          <span>Jogos & Geek</span>
+        </button>
+        <button class="category-btn" data-category="geography">
+          <span class="category-icon" aria-hidden="true">🌍</span>
+          <span>Geografia & Países</span>
+        </button>
+        <button class="category-btn" data-category="animals">
+          <span class="category-icon" aria-hidden="true">🦁</span>
+          <span>Reino Animal</span>
+        </button>
+        <button class="category-btn" data-category="tech">
+          <span class="category-icon" aria-hidden="true">🚀</span>
+          <span>Ciência & Tecnologia</span>
+        </button>
+        <button class="category-btn" data-category="cinema" style="grid-column: span 2;">
+          <span class="category-icon" aria-hidden="true">🍿</span>
+          <span>Cinema & Cultura Pop</span>
+        </button>
+      </div>
+
+      <button id="btnBackFromCategories" class="btn-secondary" style="width: 100%;">
+        ← Voltar ao Início
+      </button>
+    </section>
+
+    <!-- 3. TELA: CRIADOR DE DESAFIO PERSONALIZADO -->
+    <section id="creatorScreen" class="screen-container hidden" aria-labelledby="creatorTitle">
+      <header class="screen-header">
+        <h1 id="creatorTitle">Criar Desafio Personalizado</h1>
+        <p>Defina a palavra secreta e dicas para desafiar amigos via link ou QR Code.</p>
+      </header>
+
+      <div class="form-group">
+        <label for="customSecretWord">Palavra Secreta (mínimo 3 letras) *</label>
+        <input type="text" id="customSecretWord" class="input-field" placeholder="Ex: METROID" maxlength="25" autocomplete="off" required>
+      </div>
+
+      <div class="form-group">
+        <label for="customHint1">Dica 1 *</label>
+        <input type="text" id="customHint1" class="input-field" placeholder="Ex: Clássico jogo de exploração espacial da Nintendo" maxlength="100">
+      </div>
+
+      <div class="form-group">
+        <label for="customHint2">Dica 2 (opcional)</label>
+        <input type="text" id="customHint2" class="input-field" placeholder="Ex: Protagonizado pela caçadora de recompensas Samus Aran" maxlength="100">
+      </div>
+
+      <div class="form-group">
+        <label for="customCreatorName">Seu Nome / Apelido</label>
+        <input type="text" id="customCreatorName" class="input-field" placeholder="Ex: Professor João" maxlength="20">
+      </div>
+
+      <div class="form-actions">
+        <button id="btnBackFromCreator" class="btn-secondary">Cancelar</button>
+        <button id="btnSubmitCreation" class="btn-primary">✨ Gerar e Compartilhar</button>
+      </div>
+    </section>
+
+    <!-- 4. TELA: GAMEPLAY DO ANAGRAMA -->
+    <section id="gameScreen" class="screen-container hidden" aria-labelledby="gameScreenTitle">
+      <!-- Barra de Informações do Jogo -->
+      <div class="game-stats-bar">
+        <span id="gameCategoryBadge" class="category-tag">Categoria</span>
+        <div class="stat-item" aria-live="off">
+          <span>⏱️</span>
+          <span id="gameTimer" class="timer-display">00:00</span>
+        </div>
+        <button id="btnSurrender" class="btn-danger-outline" title="Desistir da partida e ver resposta">
+          Desistir
+        </button>
+      </div>
+
+      <header class="screen-header">
+        <h1 id="gameScreenTitle" style="font-size: 1.5rem; margin-bottom: 4px;">Organize as Letras</h1>
+        <p>Clique ou digite as letras na ordem correta para formar a palavra.</p>
+      </header>
+
+      <!-- Slots de Montagem da Palavra -->
+      <div id="targetSlotsContainer" class="target-slots-container" role="region" aria-label="Espaços para formação da palavra"></div>
+
+      <!-- Controles de Ação de Letras -->
+      <div class="game-controls">
+        <button id="btnShuffleRack" class="control-btn" title="Embaralhar letras restantes">
+          🔀 Embaralhar
+        </button>
+        <button id="btnClearSlots" class="control-btn" title="Limpar todas as letras colocadas">
+          🗑️ Limpar
+        </button>
+        <button id="btnBackspace" class="control-btn" title="Remover última letra">
+          ⌫ Apagar
+        </button>
+      </div>
+
+      <!-- Rack de Letras Disponíveis (Embaralhadas) -->
+      <div id="rackContainer" class="rack-container" role="region" aria-label="Letras disponíveis para clique"></div>
+
+      <!-- Área de Dicas -->
+      <div class="hints-container">
+        <button id="btnRevealHint1" class="hint-trigger-btn">
+          <span>💡 Revelar Dica 1</span>
+          <span style="font-size: 0.75rem; opacity: 0.8;">-200 pts</span>
+        </button>
+        <p id="hint1Card" class="hint-card"></p>
+
+        <button id="btnRevealHint2" class="hint-trigger-btn">
+          <span>💡 Revelar Dica 2</span>
+          <span style="font-size: 0.75rem; opacity: 0.8;">-200 pts</span>
+        </button>
+        <p id="hint2Card" class="hint-card"></p>
+      </div>
+
+      <!-- Seção Alternativa: Digitação Direta -->
+      <div class="manual-input-section">
+        <input type="text" id="manualAnswerInput" class="input-field" placeholder="Ou digite a resposta completa..." autocomplete="off">
+        <button id="btnSubmitManual" class="btn-secondary">Enviar</button>
+      </div>
+    </section>
+
+    <!-- 5. TELA: FIM DE JOGO / VITÓRIA -->
+    <section id="gameOverScreen" class="screen-container hidden" aria-labelledby="gameOverTitle">
+      <div id="victoryIcon" class="victory-icon" aria-hidden="true">🎉</div>
+      <header class="screen-header">
+        <h1 id="gameOverTitle">Parabéns!</h1>
+        <p id="gameOverMessage">Você decifrou o anagrama com sucesso.</p>
+      </header>
+
+      <div>
+        <span style="font-size: 0.85rem; color: var(--text-secondary);">Palavra Solucionada:</span>
+        <br>
+        <span id="gameOverSolution" class="solution-badge">PALAVRA</span>
+      </div>
+
+      <!-- Placar -->
+      <div class="score-display-box">
+        <p>Pontuação Conquistada</p>
+        <div id="finalScoreCounter" class="score-counter">0</div>
+      </div>
+
+      <!-- Salvar no Ranking -->
+      <div style="margin-bottom: 24px;">
+        <label for="rankingPlayerName" style="display:block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">
+          Grave seu nome no Mural de Líderes:
+        </label>
+        <div style="display: flex; gap: 8px; justify-content: center; max-width: 360px; margin: 0 auto;">
+          <input type="text" id="rankingPlayerName" class="input-field" placeholder="Seu apelido" maxlength="15">
+          <button id="btnSaveRanking" class="btn-primary" style="flex: 0 0 auto;">Salvar</button>
+        </div>
+      </div>
+
+      <!-- Ações Finais -->
+      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button id="btnShareChallenge" class="btn-secondary">
+          🔗 Desafiar Amigo
+        </button>
+        <button id="btnPlayAgain" class="btn-primary">
+          🔄 Jogar Novamente
+        </button>
+      </div>
+    </section>
+
+    <!-- 6. TELA: RANKING COMPLETO -->
+    <section id="rankingScreen" class="screen-container hidden" aria-labelledby="rankingTitle">
+      <header class="screen-header">
+        <h1 id="rankingTitle">🏆 Mural de Líderes</h1>
+        <p>Os maiores decifradores de enigmas registrados neste dispositivo.</p>
+      </header>
+
+      <ul id="fullRankingList" class="ranking-list" style="margin-bottom: 24px;"></ul>
+
+      <button id="btnBackFromRanking" class="btn-secondary" style="width: 100%;">
+        ← Voltar ao Início
+      </button>
+    </section>
+
+  </main>
+
+  <!-- MODAL: COMPARTILHAMENTO & QR CODE NATIVO -->
+  <div id="shareModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+    <div class="modal-card">
+      <button id="btnCloseShareModal" class="modal-close-btn" aria-label="Fechar Modal">✕</button>
+      <h2 id="shareModalTitle" style="font-size: 1.3rem; margin-bottom: 6px;">Desafio Criado!</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary);">
+        Escaneie o QR Code ou copie o link atômico para enviar a quem você quiser:
+      </p>
+
+      <!-- Canvas Nativo para QR Code -->
+      <div class="qr-canvas-wrapper">
+        <canvas id="shareQrCanvas" width="200" height="200" aria-label="QR Code com link do desafio"></canvas>
+      </div>
+
+      <div class="share-url-box">
+        <input type="text" id="shareUrlInput" class="input-field" readonly style="font-size: 0.85rem;">
+        <button id="copyShareUrlBtn" class="btn-primary" style="flex: 0 0 auto;">Copiar Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTAINER DE TOASTS FLUTUANTES -->
+  <aside id="toastContainer" class="toast-container" aria-live="assertive"></aside>
+
+  <!-- Script Modular ES6 Principal -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
