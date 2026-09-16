@@ -31,7 +31,12 @@
       <span class="brand-title">Anagram<span>Master</span></span>
     </div>
 
-    <div class="header-actions">
+    <!-- Botão Hamburger / Toggle para Mobile -->
+    <button id="btnMobileMenuToggle" class="btn-icon mobile-menu-toggle" aria-label="Abrir Menu de Opções" aria-expanded="false" aria-controls="headerActions">
+      <span id="mobileMenuIcon">☰</span>
+    </button>
+
+    <div class="header-actions" id="headerActions">
       <!-- Badge de Conectividade PWA -->
       <div id="connectionStatusBadge" class="status-badge online" role="status" aria-live="polite">
         <span class="status-dot"></span>
@@ -39,7 +44,7 @@
       </div>
 
       <!-- Botão de Login / Perfil -->
-      <button id="headerAuthBtn" class="btn-secondary" style="padding: 5px 10px; font-size: 0.82rem;" aria-label="Entrar na Conta">
+      <button id="headerAuthBtn" class="btn-secondary header-action-auth" style="padding: 5px 10px; font-size: 0.82rem;" aria-label="Entrar na Conta">
         🔑 Entrar
       </button>
 

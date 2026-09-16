@@ -53,6 +53,7 @@ class AnagramApp {
     this.setupGlobalEvents();
     this.setupThemeSelector();
     this.setupAudioToggle();
+    this.setupMobileMenu();
     this.loadRanking();
 
     // Checagem de Rotas por Hash (#room=... ou #c=...)
@@ -135,6 +136,62 @@ class AnagramApp {
         updateIcon(enabled);
       });
     }
+  }
+
+  setupMobileMenu() {
+    const toggleBtn = document.getElementById('btnMobileMenuToggle');
+    const menu = document.getElementById('headerActions');
+    const icon = document.getElementById('mobileMenuIcon');
+
+    if (!toggleBtn || !menu) return;
+
+    const closeMenu = () => {
+      menu.classList.remove('is-open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      if (icon) icon.textContent = '☰';
+    };
+
+    const openMenu = () => {
+      menu.classList.add('is-open');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      if (icon) icon.textContent = '✕';
+      audio.playTileClick();
+    };
+
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = menu.classList.contains('is-open');
+      if (isOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    // Fecha o menu se o usuário clicar fora dele
+    document.addEventListener('click', (e) => {
+      if (!menu.contains(e.target) && !toggleBtn.contains(e.target)) {
+        if (menu.classList.contains('is-open')) {
+          closeMenu();
+        }
+      }
+    });
+
+    // Fecha o menu ao interagir com opções internas no mobile
+    menu.querySelectorAll('button, select').forEach(elem => {
+      elem.addEventListener('click', () => {
+        if (window.innerWidth < 768) {
+          setTimeout(closeMenu, 180);
+        }
+      });
+    });
+
+    // Fecha automaticamente ao redimensionar para tela de desktop
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768 && menu.classList.contains('is-open')) {
+        closeMenu();
+      }
+    });
   }
 
   setupGlobalEvents() {
