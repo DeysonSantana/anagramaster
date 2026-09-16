@@ -142,6 +142,21 @@ export class AuthManager {
       this.openProfileModal();
     });
 
+    // Mobile Drawer Account Trigger
+    const drawerCardAccount = document.getElementById('drawerCardAccount');
+    const drawerAuthPillBtn = document.getElementById('drawerAuthPillBtn');
+    const handleDrawerAccountClick = (e) => {
+      e.stopPropagation();
+      audio.playTileClick();
+      if (this.currentUser) {
+        this.openProfileModal();
+      } else {
+        this.openAuthModal();
+      }
+    };
+    drawerCardAccount?.addEventListener('click', handleDrawerAccountClick);
+    drawerAuthPillBtn?.addEventListener('click', handleDrawerAccountClick);
+
     // Fechar Modais
     this.dom.btnCloseAuthModal?.addEventListener('click', () => this.closeAuthModal());
     this.dom.btnCloseGuestModal?.addEventListener('click', () => this.closeGuestModal());
@@ -409,6 +424,24 @@ export class AuthManager {
         this.dom.headerAuthBtn.classList.remove('hidden');
         this.dom.headerUserProfileBtn.classList.add('hidden');
       }
+    }
+
+    // Sincroniza card de conta no mobile aside drawer
+    const drawerAvatar = document.getElementById('drawerUserAvatar');
+    const drawerTitle = document.getElementById('drawerAccountTitle');
+    const drawerSubtitle = document.getElementById('drawerAccountSubtitle');
+    const drawerPill = document.getElementById('drawerAuthPillBtn');
+
+    if (hasUser) {
+      if (drawerAvatar) drawerAvatar.textContent = this.currentUser.avatarEmoji || '👤';
+      if (drawerTitle) drawerTitle.textContent = this.currentUser.displayName || 'Jogador';
+      if (drawerSubtitle) drawerSubtitle.textContent = this.currentUser.email || (this.currentUser.isGuest ? 'Convidado (Offline)' : 'Conta Conectada');
+      if (drawerPill) drawerPill.textContent = 'Perfil';
+    } else {
+      if (drawerAvatar) drawerAvatar.textContent = '👤';
+      if (drawerTitle) drawerTitle.textContent = 'Minha Conta';
+      if (drawerSubtitle) drawerSubtitle.textContent = 'Visitante (Offline Local)';
+      if (drawerPill) drawerPill.textContent = 'Entrar';
     }
   }
 

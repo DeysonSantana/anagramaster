@@ -32,7 +32,7 @@
     </div>
 
     <!-- Botão Hamburger / Toggle para Mobile -->
-    <button id="btnMobileMenuToggle" class="btn-icon mobile-menu-toggle" aria-label="Abrir Menu de Opções" aria-expanded="false" aria-controls="headerActions">
+    <button id="btnMobileMenuToggle" class="btn-icon mobile-menu-toggle" aria-label="Abrir Menu de Opções" aria-expanded="false" aria-controls="appDrawer">
       <span id="mobileMenuIcon">☰</span>
     </button>
 
@@ -73,6 +73,115 @@
       </button>
     </div>
   </header>
+
+  <!-- BACKDROP DO MENU ASIDE MOBILE -->
+  <div id="drawerBackdrop" class="drawer-backdrop" aria-hidden="true"></div>
+
+  <!-- MENU ASIDE OFF-CANVAS MOBILE (ESTILO QUIZMASTER) -->
+  <aside id="appDrawer" class="app-drawer" aria-hidden="true" role="dialog" aria-label="Menu de Navegação">
+    <!-- Cabeçalho do Drawer -->
+    <div class="drawer-header">
+      <div class="drawer-brand">
+        <div class="drawer-logo-badge" aria-hidden="true">🧩</div>
+        <div class="drawer-brand-text">
+          <span class="drawer-title">AnagramMaster</span>
+          <span class="drawer-subtitle">Menu &amp; Navegação</span>
+        </div>
+      </div>
+      <button id="btnCloseDrawer" class="drawer-close-btn" aria-label="Fechar Menu">✕</button>
+    </div>
+
+    <!-- Lista de Cards de Navegação (Estilo QuizMaster) -->
+    <div class="drawer-content">
+      <!-- Card 1: Minha Conta -->
+      <div class="drawer-card drawer-card-account" id="drawerCardAccount" role="button" tabindex="0">
+        <div class="drawer-card-icon icon-account">
+          <span id="drawerUserAvatar">👤</span>
+        </div>
+        <div class="drawer-card-info">
+          <h3 id="drawerAccountTitle">Minha Conta</h3>
+          <p id="drawerAccountSubtitle">Visitante (Offline Local)</p>
+        </div>
+        <button id="drawerAuthPillBtn" class="drawer-pill-btn" aria-label="Entrar ou acessar perfil">Entrar</button>
+      </div>
+
+      <!-- Card 2: Salas & Rankings (Destaque visual vibrante) -->
+      <div class="drawer-card drawer-card-highlight" id="drawerBtnRooms" role="button" tabindex="0">
+        <div class="drawer-card-icon icon-rooms" aria-hidden="true">🏆</div>
+        <div class="drawer-card-info">
+          <h3>Salas &amp; Rankings</h3>
+          <p>Pódios ao vivo, PINs e colocações</p>
+        </div>
+      </div>
+
+      <!-- Card 3: Modo Dicionário -->
+      <div class="drawer-card" id="drawerBtnDictionary" role="button" tabindex="0">
+        <div class="drawer-card-icon icon-dict" aria-hidden="true">📚</div>
+        <div class="drawer-card-info">
+          <h3>Modo Dicionário</h3>
+          <p>Categorias, temas e treino solo</p>
+        </div>
+      </div>
+
+      <!-- Card 4: Desafio do Dia -->
+      <div class="drawer-card" id="drawerBtnDaily" role="button" tabindex="0">
+        <div class="drawer-card-icon icon-daily" aria-hidden="true">📅</div>
+        <div class="drawer-card-info">
+          <h3>Desafio do Dia</h3>
+          <p>Palavra diária competitiva para todos</p>
+        </div>
+      </div>
+
+      <!-- Card 5: Criar Desafio Solo -->
+      <div class="drawer-card" id="drawerBtnCreator" role="button" tabindex="0">
+        <div class="drawer-card-icon icon-create" aria-hidden="true">✏️</div>
+        <div class="drawer-card-info">
+          <h3>Criar &amp; Compartilhar</h3>
+          <p>Link portátil, encurtador e QR Code</p>
+        </div>
+      </div>
+
+      <!-- Card 6: Mural de Líderes -->
+      <div class="drawer-card" id="drawerBtnRanking" role="button" tabindex="0">
+        <div class="drawer-card-icon icon-trophy" aria-hidden="true">🥇</div>
+        <div class="drawer-card-info">
+          <h3>Mural de Líderes</h3>
+          <p>Recordes e pontuações do dispositivo</p>
+        </div>
+      </div>
+
+      <!-- Seção: Configurações & Sistema -->
+      <div class="drawer-section-title">Configurações Rápidas</div>
+
+      <div class="drawer-settings-card">
+        <div class="drawer-setting-row">
+          <span class="drawer-setting-label">🎨 Tema Visual:</span>
+          <select id="drawerThemeSelect" class="drawer-select" aria-label="Selecione o Tema Visual">
+            <option value="nintendo">Nintendo</option>
+            <option value="amoled">AMOLED</option>
+            <option value="emerald">Esmeralda</option>
+            <option value="sunset">Cyber Sunset</option>
+            <option value="light">Clean Light</option>
+          </select>
+        </div>
+
+        <div class="drawer-setting-row">
+          <span class="drawer-setting-label">🔊 Efeitos Sonoros:</span>
+          <button id="drawerToggleAudioBtn" class="drawer-toggle-btn" aria-label="Alternar Efeitos Sonoros">Ligado</button>
+        </div>
+
+        <div class="drawer-setting-row" id="drawerInstallRow">
+          <span class="drawer-setting-label">📲 Aplicativo:</span>
+          <button id="drawerBtnInstallPwa" class="drawer-toggle-btn highlight" aria-label="Instalar Aplicativo PWA">Instalar App</button>
+        </div>
+
+        <div class="drawer-setting-row">
+          <span class="drawer-setting-label">🌐 Conectividade:</span>
+          <span id="drawerConnectionBadge" class="drawer-badge online">● Online</span>
+        </div>
+      </div>
+    </div>
+  </aside>
 
   <!-- ÁREA DE CONTEÚDO PRINCIPAL (SPA SCREENS) -->
   <main class="main-content" id="mainContent" role="main">

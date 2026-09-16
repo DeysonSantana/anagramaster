@@ -119,78 +119,153 @@ class AnagramApp {
         audio.playTileClick();
       });
     }
-  }
 
-  setupAudioToggle() {
-    const btn = document.getElementById('btnToggleAudio');
-    if (btn) {
-      const updateIcon = (enabled) => {
-        btn.innerHTML = enabled ? '🔊' : '🔇';
-        btn.title = enabled ? 'Desativar Sons' : 'Ativar Sons';
-        btn.setAttribute('aria-label', btn.title);
-      };
-      updateIcon(audio.isSoundEnabled());
-
-      btn.addEventListener('click', () => {
-        const enabled = audio.toggleSound();
-        updateIcon(enabled);
+    const drawerSelect = document.getElementById('drawerThemeSelect');
+    if (drawerSelect) {
+      drawerSelect.value = themeManager.getCurrentTheme();
+      drawerSelect.addEventListener('change', (e) => {
+        themeManager.applyTheme(e.target.value);
+        audio.playTileClick();
       });
     }
   }
 
-  setupMobileMenu() {
-    const toggleBtn = document.getElementById('btnMobileMenuToggle');
-    const menu = document.getElementById('headerActions');
-    const icon = document.getElementById('mobileMenuIcon');
+  setupAudioToggle() {
+    const btn = document.getElementById('btnToggleAudio');
+    const drawerBtn = document.getElementById('drawerToggleAudioBtn');
 
-    if (!toggleBtn || !menu) return;
-
-    const closeMenu = () => {
-      menu.classList.remove('is-open');
-      toggleBtn.setAttribute('aria-expanded', 'false');
-      if (icon) icon.textContent = '☰';
+    const updateAudioUI = (enabled) => {
+      if (btn) {
+        btn.innerHTML = enabled ? '🔊' : '🔇';
+        btn.title = enabled ? 'Desativar Sons' : 'Ativar Sons';
+        btn.setAttribute('aria-label', btn.title);
+      }
+      if (drawerBtn) {
+        drawerBtn.textContent = enabled ? 'Ligado' : 'Desligado';
+        drawerBtn.setAttribute('aria-label', enabled ? 'Desativar Sons' : 'Ativar Sons');
+      }
     };
 
-    const openMenu = () => {
-      menu.classList.add('is-open');
+    updateAudioUI(audio.isSoundEnabled());
+
+    btn?.addEventListener('click', () => {
+      const enabled = audio.toggleSound();
+      updateAudioUI(enabled);
+    });
+
+    drawerBtn?.addEventListener('click', () => {
+      const enabled = audio.toggleSound();
+      updateAudioUI(enabled);
+    });
+  }
+
+  setupMobileMenu() {
+    const toggleBtn = document.getElementById('btnMobileMenuToggle');
+    const drawer = document.getElementById('appDrawer');
+    const backdrop = document.getElementById('drawerBackdrop');
+    const closeBtn = document.getElementById('btnCloseDrawer');
+
+    if (!toggleBtn || !drawer) return;
+
+    const openDrawer = () => {
+      drawer.classList.add('is-open');
+      backdrop?.classList.add('is-open');
+      drawer.setAttribute('aria-hidden', 'false');
       toggleBtn.setAttribute('aria-expanded', 'true');
-      if (icon) icon.textContent = '✕';
+      document.body.style.overflow = 'hidden';
       audio.playTileClick();
+    };
+
+    const closeDrawer = () => {
+      drawer.classList.remove('is-open');
+      backdrop?.classList.remove('is-open');
+      drawer.setAttribute('aria-hidden', 'true');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
     };
 
     toggleBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const isOpen = menu.classList.contains('is-open');
-      if (isOpen) {
-        closeMenu();
+      if (drawer.classList.contains('is-open')) {
+        closeDrawer();
       } else {
-        openMenu();
+        openDrawer();
       }
     });
 
-    // Fecha o menu se o usuário clicar fora dele
-    document.addEventListener('click', (e) => {
-      if (!menu.contains(e.target) && !toggleBtn.contains(e.target)) {
-        if (menu.classList.contains('is-open')) {
-          closeMenu();
-        }
+    closeBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      audio.playTileClick();
+      closeDrawer();
+    });
+
+    backdrop?.addEventListener('click', () => {
+      closeDrawer();
+    });
+
+    // Tecla ESC fecha o menu aside
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
+        closeDrawer();
       }
     });
 
-    // Fecha o menu ao interagir com opções internas no mobile
-    menu.querySelectorAll('button, select').forEach(elem => {
-      elem.addEventListener('click', () => {
-        if (window.innerWidth < 768) {
-          setTimeout(closeMenu, 180);
-        }
+    // Fecha automaticamente ao redimensionar para Desktop (>= 768px)
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768 && drawer.classList.contains('is-open')) {
+        closeDrawer();
+      }
+    });
+
+    // Navegação através dos cards do Aside Drawer (Estilo QuizMaster)
+    document.getElementById('drawerBtnRooms')?.addEventListener('click', () => {
+      closeDrawer();
+      audio.playTileClick();
+      this.roomManager.openCreateRoomModal();
+    });
+
+    document.getElementById('drawerBtnDictionary')?.addEventListener('click', () => {
+      closeDrawer();
+      audio.playTileClick();
+      if (this.timerInterval) this.stopTimer();
+      this.switchScreen('category');
+    });
+
+    document.getElementById('drawerBtnDaily')?.addEventListener('click', () => {
+      closeDrawer();
+      audio.playTileClick();
+      if (this.timerInterval) this.stopTimer();
+      const daily = DictionaryManager.getDailyChallenge();
+      this.startGame({
+        secretWord: daily.word,
+        hint1: daily.hint1,
+        hint2: daily.hint2,
+        category: daily.category,
+        isDaily: true
       });
     });
 
-    // Fecha automaticamente ao redimensionar para tela de desktop
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= 768 && menu.classList.contains('is-open')) {
-        closeMenu();
-      }
+    document.getElementById('drawerBtnCreator')?.addEventListener('click', () => {
+      closeDrawer();
+      audio.playTileClick();
+      if (this.timerInterval) this.stopTimer();
+      this.switchScreen('creator');
+    });
+
+    document.getElementById('drawerBtnRanking')?.addEventListener('click', () => {
+      closeDrawer();
+      audio.playTileClick();
+      if (this.timerInterval) this.stopTimer();
+      this.loadRanking();
+      this.switchScreen('ranking');
+    });
+
+    // Ao interagir com a conta pelo drawer, fecha suavemente
+    document.getElementById('drawerCardAccount')?.addEventListener('click', () => {
+      setTimeout(closeDrawer, 120);
+    });
+    document.getElementById('drawerAuthPillBtn')?.addEventListener('click', () => {
+      setTimeout(closeDrawer, 120);
     });
   }
 

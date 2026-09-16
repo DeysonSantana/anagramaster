@@ -53,10 +53,14 @@ class ThemeManager {
       metaTheme.setAttribute('content', THEMES[themeKey].color);
     }
 
-    // Sincronizar select se existir
+    // Sincronizar select se existir (desktop e mobile drawer)
     const select = document.getElementById('themeSelect');
     if (select && select.value !== themeKey) {
       select.value = themeKey;
+    }
+    const drawerSelect = document.getElementById('drawerThemeSelect');
+    if (drawerSelect && drawerSelect.value !== themeKey) {
+      drawerSelect.value = themeKey;
     }
   }
 
