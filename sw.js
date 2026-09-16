@@ -3,7 +3,7 @@
 // Estratégia: Cache-First com Network Fallback e Limpeza Atômica de Cache
 // ==========================================================================
 
-const CACHE_NAME = 'anagram-master-v3';
+const CACHE_NAME = 'anagram-master-v4';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -20,6 +20,10 @@ const ASSETS_TO_CACHE = [
   './js/qrcodeEngine.js',
   './js/shareManager.js',
   './js/offlineManager.js',
+  './js/firebaseConfig.js',
+  './js/authManager.js',
+  './js/roomManager.js',
+  './js/leaderboardManager.js',
   './assets/icons/icon-192x192.png',
   './assets/icons/icon-512x512.png'
 ];

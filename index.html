@@ -2,8 +2,8 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="AnagramMaster - Jogo de quebra-cabeça e anagramas 100% offline-first com sons sintetizados, temas e compartilhamento via QR Code.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="AnagramMaster - Jogo de quebra-cabeça e anagramas 100% offline-first com multiplayer em tempo real, Google Sign-In, temas e QR Code.">
 
   <!-- Metadados PWA -->
   <link rel="manifest" href="manifest.json">
@@ -11,7 +11,7 @@
   <link rel="apple-touch-icon" href="assets/icons/icon-192x192.png">
   <link rel="shortcut icon" href="assets/icons/icon-192x192.png" type="image/png">
 
-  <title>AnagramMaster // Desafio de Anagramas</title>
+  <title>AnagramMaster // Desafio de Anagramas Multiplayer</title>
 
   <!-- Tipografia Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,6 +37,16 @@
         <span class="status-dot"></span>
         <span id="connectionStatusText">Online</span>
       </div>
+
+      <!-- Botão de Login / Perfil -->
+      <button id="headerAuthBtn" class="btn-secondary" style="padding: 5px 10px; font-size: 0.82rem;" aria-label="Entrar na Conta">
+        🔑 Entrar
+      </button>
+
+      <button id="headerUserProfileBtn" class="header-user-btn hidden" aria-label="Ver Perfil">
+        <span id="headerUserAvatar" class="header-user-avatar">👤</span>
+        <span id="headerUserName" class="header-user-name">Jogador</span>
+      </button>
 
       <!-- Seletor de Tema -->
       <select id="themeSelect" class="theme-select" aria-label="Selecione o Tema Visual">
@@ -66,20 +76,43 @@
     <section id="hubScreen" class="screen-container" aria-labelledby="hubTitle">
       <header class="screen-header">
         <h1 id="hubTitle">Desafio de Anagramas</h1>
-        <p>Decifre palavras embaralhadas, dispute rankings e desafie seus amigos.</p>
+        <p>Decifre palavras embaralhadas, jogue com amigos em tempo real e dispute o ranking.</p>
       </header>
 
+      <!-- Entrada Rápida de PIN para Salas de Grupo -->
+      <div class="hub-pin-box">
+        <div class="hub-pin-box-title">
+          <span>👥</span>
+          <span>Entrar em uma Sala Multiplayer</span>
+        </div>
+        <div class="hub-pin-inputs-wrapper">
+          <input type="text" id="hubPinInput" class="pin-input-field" placeholder="PIN" maxlength="6" inputmode="numeric" autocomplete="off">
+          <button id="btnHubJoinPin" class="btn-primary" style="flex: 0 0 auto; padding: 10px 16px;">
+            Entrar
+          </button>
+        </div>
+      </div>
+
       <div class="hub-grid">
-        <!-- Card 1: Dicionário Offline -->
+        <!-- Card 1: Criar Sala de Grupo -->
+        <article class="hub-card" id="hubBtnCreateRoom" tabindex="0" role="button" style="border-color: var(--accent-primary);">
+          <div class="hub-card-icon" style="background: var(--tile-active-bg); color: var(--accent-primary);" aria-hidden="true">👥</div>
+          <div class="hub-card-content">
+            <h3 style="color: var(--accent-primary);">Criar Sala em Grupo</h3>
+            <p>Gere um PIN e jogue ao vivo estilo Kahoot com pódio em tempo real.</p>
+          </div>
+        </article>
+
+        <!-- Card 2: Dicionário Offline -->
         <article class="hub-card" id="hubBtnDictionary" tabindex="0" role="button">
           <div class="hub-card-icon" aria-hidden="true">📚</div>
           <div class="hub-card-content">
             <h3>Modo Dicionário</h3>
-            <p>Jogue por categorias como Jogos, Geografia, Animais e Ciência.</p>
+            <p>Jogue por temas como Jogos, Geografia, Animais e Ciência.</p>
           </div>
         </article>
 
-        <!-- Card 2: Desafio do Dia -->
+        <!-- Card 3: Desafio do Dia -->
         <article class="hub-card" id="hubBtnDaily" tabindex="0" role="button">
           <span class="badge-daily">Diário</span>
           <div class="hub-card-icon" aria-hidden="true">📅</div>
@@ -89,17 +122,17 @@
           </div>
         </article>
 
-        <!-- Card 3: Criador de Desafio -->
+        <!-- Card 4: Criador de Desafio -->
         <article class="hub-card" id="hubBtnCreator" tabindex="0" role="button">
           <div class="hub-card-icon" aria-hidden="true">✏️</div>
           <div class="hub-card-content">
-            <h3>Criar Desafio</h3>
-            <p>Crie seu próprio anagrama e compartilhe via Link e QR Code.</p>
+            <h3>Criar Desafio Solo</h3>
+            <p>Crie seu próprio enigma e compartilhe via Link e QR Code.</p>
           </div>
         </article>
 
-        <!-- Card 4: Ranking -->
-        <article class="hub-card" id="hubBtnRanking" tabindex="0" role="button">
+        <!-- Card 5: Ranking -->
+        <article class="hub-card" id="hubBtnRanking" tabindex="0" role="button" style="grid-column: 1 / -1;">
           <div class="hub-card-icon" aria-hidden="true">🏆</div>
           <div class="hub-card-content">
             <h3>Mural de Líderes</h3>
@@ -110,7 +143,7 @@
 
       <!-- Preview Rápido de Ranking -->
       <section class="ranking-container">
-        <h2 style="font-size: 1.1rem; color: var(--text-primary); margin-bottom: 8px;">Top Pontuações</h2>
+        <h2 style="font-size: 1.05rem; color: var(--text-primary); margin-bottom: 8px;">Top Pontuações Recentes</h2>
         <ul id="hubRankingList" class="ranking-list" aria-label="Melhores pontuações recentes"></ul>
       </section>
     </section>
@@ -139,13 +172,13 @@
           <span class="category-icon" aria-hidden="true">🚀</span>
           <span>Ciência & Tecnologia</span>
         </button>
-        <button class="category-btn" data-category="cinema" style="grid-column: span 2;">
+        <button class="category-btn" data-category="cinema">
           <span class="category-icon" aria-hidden="true">🍿</span>
-          <span>Cinema & Cultura Pop</span>
+          <span>Cinema & Pop</span>
         </button>
       </div>
 
-      <button id="btnBackFromCategories" class="btn-secondary" style="width: 100%;">
+      <button id="btnBackFromCategories" class="btn-secondary" style="width: 100%; margin-top: 10px;">
         ← Voltar ao Início
       </button>
     </section>
@@ -169,7 +202,7 @@
 
       <div class="form-group">
         <label for="customHint2">Dica 2 (opcional)</label>
-        <input type="text" id="customHint2" class="input-field" placeholder="Ex: Protagonizado pela caçadora de recompensas Samus Aran" maxlength="100">
+        <input type="text" id="customHint2" class="input-field" placeholder="Ex: Protagonizado pela caçadora Samus Aran" maxlength="100">
       </div>
 
       <div class="form-group">
@@ -198,7 +231,7 @@
       </div>
 
       <header class="screen-header">
-        <h1 id="gameScreenTitle" style="font-size: 1.5rem; margin-bottom: 4px;">Organize as Letras</h1>
+        <h1 id="gameScreenTitle" style="font-size: clamp(1.2rem, 3.5vw, 1.5rem); margin-bottom: 4px;">Organize as Letras</h1>
         <p>Clique ou digite as letras na ordem correta para formar a palavra.</p>
       </header>
 
@@ -238,7 +271,7 @@
 
       <!-- Seção Alternativa: Digitação Direta -->
       <div class="manual-input-section">
-        <input type="text" id="manualAnswerInput" class="input-field" placeholder="Ou digite a resposta completa..." autocomplete="off">
+        <input type="text" id="manualAnswerInput" class="input-field" placeholder="Ou digite a resposta..." autocomplete="off">
         <button id="btnSubmitManual" class="btn-secondary">Enviar</button>
       </div>
     </section>
@@ -264,7 +297,7 @@
       </div>
 
       <!-- Salvar no Ranking -->
-      <div style="margin-bottom: 24px;">
+      <div style="margin-bottom: 20px;">
         <label for="rankingPlayerName" style="display:block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px;">
           Grave seu nome no Mural de Líderes:
         </label>
@@ -275,7 +308,7 @@
       </div>
 
       <!-- Ações Finais -->
-      <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+      <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
         <button id="btnShareChallenge" class="btn-secondary">
           🔗 Desafiar Amigo
         </button>
@@ -285,7 +318,80 @@
       </div>
     </section>
 
-    <!-- 6. TELA: RANKING COMPLETO -->
+    <!-- 6. TELA: LOBBY DE SALA MULTIPLAYER -->
+    <section id="roomLobbyScreen" class="screen-container hidden" aria-labelledby="lobbyTitle">
+      <header class="screen-header">
+        <h1 id="lobbyTitle">Lobby da Sala</h1>
+        <p>Aguardando participantes entrarem pelo PIN ou QR Code.</p>
+      </header>
+
+      <div class="lobby-pin-card">
+        <span style="font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">PIN da Sala</span>
+        <div id="lobbyPinDisplay" class="lobby-pin-number">------</div>
+      </div>
+
+      <!-- QR Code Canvas para entrada móvel -->
+      <div class="qr-canvas-wrapper">
+        <canvas id="lobbyQrCanvas" width="180" height="180" aria-label="QR Code para entrar na sala"></canvas>
+      </div>
+
+      <div class="share-url-box">
+        <input type="text" id="lobbyDirectUrlInput" class="input-field" readonly style="font-size: 0.85rem;">
+        <button id="btnCopyLobbyUrl" class="btn-secondary" style="flex: 0 0 auto;">Copiar Link</button>
+      </div>
+
+      <!-- Participantes Conectados ao Vivo -->
+      <div class="participants-box">
+        <h3 style="font-size: 0.95rem; color: var(--text-primary);">
+          Participantes (<span id="lobbyParticipantsCount">0</span>)
+        </h3>
+        <div id="lobbyParticipantsContainer" class="participants-grid"></div>
+      </div>
+
+      <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 8px;">
+        <button id="btnHostStartGame" class="btn-primary hidden" style="width: 100%; font-size: 1.05rem; padding: 12px;">
+          🚀 Iniciar Partida Agora!
+        </button>
+        <div id="lobbyWaitingStatus" class="status-badge" style="justify-content: center; padding: 8px;">
+          ⏳ Aguardando o Host iniciar a partida...
+        </div>
+        <button id="btnLeaveLobby" class="btn-secondary" style="width: 100%;">
+          ← Sair da Sala
+        </button>
+      </div>
+    </section>
+
+    <!-- 7. TELA: PÓDIO MULTIPLAYER AO VIVO -->
+    <section id="roomPodiumScreen" class="screen-container hidden" aria-labelledby="podiumTitle">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span id="podiumPinBadge" class="category-tag">PIN: ------</span>
+        <span class="status-badge online"><span class="status-dot"></span> Ao Vivo</span>
+      </div>
+
+      <header class="screen-header">
+        <h1 id="podiumTitle">🏆 Pódio dos Campeões</h1>
+        <p>Classificação em tempo real dos participantes da sala.</p>
+      </header>
+
+      <!-- Pódio Visual 1º, 2º e 3º -->
+      <div class="podium-container">
+        <div id="secondPlaceCard"></div>
+        <div id="firstPlaceCard"></div>
+        <div id="thirdPlaceCard"></div>
+      </div>
+
+      <!-- Lista completa das demais colocações -->
+      <div style="margin-top: 20px; text-align: left;">
+        <h3 style="font-size: 0.95rem; color: var(--text-primary); margin-bottom: 8px;">Classificação Geral</h3>
+        <ul id="podiumScoresList" class="ranking-list"></ul>
+      </div>
+
+      <button id="btnExitPodium" class="btn-secondary" style="width: 100%; margin-top: 20px;">
+        ← Voltar ao Menu Principal
+      </button>
+    </section>
+
+    <!-- 8. TELA: RANKING COMPLETO -->
     <section id="rankingScreen" class="screen-container hidden" aria-labelledby="rankingTitle">
       <header class="screen-header">
         <h1 id="rankingTitle">🏆 Mural de Líderes</h1>
@@ -300,6 +406,148 @@
     </section>
 
   </main>
+
+  <!-- MODAL: AUTENTICAÇÃO (GOOGLE SIGN-IN & EMAIL) -->
+  <div id="authModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+    <div class="modal-card">
+      <button id="btnCloseAuthModal" class="modal-close-btn" aria-label="Fechar Modal">✕</button>
+      <h2 id="authModalTitle" style="font-size: 1.3rem; margin-bottom: 6px;">Entrar no AnagramMaster</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 18px;">
+        Conecte-se para salvar seu histórico e criar salas multiplayer.
+      </p>
+
+      <div id="authErrorMsg" class="error-banner hidden" role="alert"></div>
+
+      <!-- Botão Google Sign-In -->
+      <button id="btnGoogleAuth" class="btn-google" style="margin-bottom: 16px;">
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span>Continuar com o Google</span>
+      </button>
+
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <hr style="flex: 1; border: none; border-top: 1px solid var(--border-color);">
+        <span style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Ou com email</span>
+        <hr style="flex: 1; border: none; border-top: 1px solid var(--border-color);">
+      </div>
+
+      <!-- Formulário Tradicional -->
+      <form id="authForm">
+        <div id="authNameGroup" class="form-group hidden">
+          <label for="authNameInput">Seu Nome</label>
+          <input type="text" id="authNameInput" class="input-field" placeholder="Ex: Maria Silva">
+        </div>
+        <div class="form-group">
+          <label for="authEmailInput">Email</label>
+          <input type="email" id="authEmailInput" class="input-field" placeholder="seu@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="authPasswordInput">Senha</label>
+          <input type="password" id="authPasswordInput" class="input-field" placeholder="Mínimo 6 caracteres" required>
+        </div>
+        <button type="submit" id="authSubmitBtn" class="btn-primary" style="width: 100%; margin-top: 8px;">
+          Entrar com Email
+        </button>
+      </form>
+
+      <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+        <button type="button" id="authToggleModeBtn" class="btn-secondary" style="font-size: 0.8rem; background: none; border: none; text-decoration: underline;">
+          Não tem uma conta? Cadastre-se
+        </button>
+        <button type="button" id="btnGuestAuth" class="btn-secondary" style="font-size: 0.82rem;">
+          👤 Continuar como Convidado
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIGURAÇÃO DE CONVIDADO (EMOJI PICKER) -->
+  <div id="guestSetupModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="guestModalTitle">
+    <div class="modal-card">
+      <button id="btnCloseGuestModal" class="modal-close-btn" aria-label="Fechar Modal">✕</button>
+      <h2 id="guestModalTitle" style="font-size: 1.3rem; margin-bottom: 6px;">Perfil de Convidado</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary);">Escolha seu apelido e seu avatar para as partidas:</p>
+
+      <div id="guestAvatarPreview" style="font-size: 3rem; margin: 10px 0;">🧩</div>
+
+      <div class="form-group">
+        <label for="guestNicknameInput">Seu Apelido</label>
+        <input type="text" id="guestNicknameInput" class="input-field" placeholder="Ex: MestreDosAnagramas" maxlength="15" style="text-align: center;">
+      </div>
+
+      <label style="font-size: 0.82rem; font-weight: 600; display: block; text-align: left;">Selecione seu Avatar:</label>
+      <div id="guestEmojiGrid" class="emoji-picker-grid"></div>
+
+      <button id="btnConfirmGuest" class="btn-primary" style="width: 100%; margin-top: 14px;">
+        Confirmar e Jogar
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: PERFIL DO USUÁRIO -->
+  <div id="userProfileModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
+    <div class="modal-card">
+      <button id="btnCloseProfileModal" class="modal-close-btn" aria-label="Fechar Modal">✕</button>
+      <div id="profileAvatarDisplay" style="font-size: 3.2rem; margin-bottom: 6px;">👤</div>
+      <h2 id="profileDisplayName" style="font-size: 1.3rem; margin-bottom: 4px;">Jogador</h2>
+      <p id="profileEmail" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">email@exemplo.com</p>
+
+      <label style="font-size: 0.82rem; font-weight: 600; display: block; text-align: left;">Alterar Emoji do Avatar:</label>
+      <div id="profileEmojiGrid" class="emoji-picker-grid"></div>
+
+      <button id="btnLogout" class="btn-danger-outline" style="width: 100%; margin-top: 14px; padding: 10px;">
+        🚪 Sair da Conta
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: CRIAR SALA MULTIPLAYER -->
+  <div id="createRoomModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="createRoomTitle">
+    <div class="modal-card">
+      <button id="btnCloseCreateRoom" class="modal-close-btn" aria-label="Fechar Modal">✕</button>
+      <h2 id="createRoomTitle" style="font-size: 1.3rem; margin-bottom: 6px;">Criar Sala em Grupo</h2>
+      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
+        Gere uma sala com PIN exclusivo para jogar com seus amigos em tempo real.
+      </p>
+
+      <div class="form-group">
+        <label for="roomTitleInput">Título da Sala</label>
+        <input type="text" id="roomTitleInput" class="input-field" placeholder="Ex: Desafio da Galera" maxlength="30">
+      </div>
+
+      <div class="form-group">
+        <label for="roomWordModeSelect">Origem do Anagrama</label>
+        <select id="roomWordModeSelect" class="input-field">
+          <option value="random">🎲 Palavra Aleatória do Dicionário</option>
+          <option value="custom">✏️ Digitar Minha Palavra Secreta</option>
+        </select>
+      </div>
+
+      <!-- Campos condicionais para palavra customizada -->
+      <div id="roomCustomWordGroup" class="hidden">
+        <div class="form-group">
+          <label for="roomCustomWordInput">Palavra Secreta *</label>
+          <input type="text" id="roomCustomWordInput" class="input-field" placeholder="Ex: PIRAMIDE" maxlength="20">
+        </div>
+        <div class="form-group">
+          <label for="roomCustomHint1Input">Dica 1 *</label>
+          <input type="text" id="roomCustomHint1Input" class="input-field" placeholder="Ex: Monumento do Egito Antigo" maxlength="80">
+        </div>
+        <div class="form-group">
+          <label for="roomCustomHint2Input">Dica 2 (opcional)</label>
+          <input type="text" id="roomCustomHint2Input" class="input-field" placeholder="Ex: Tumba dos Faraós" maxlength="80">
+        </div>
+      </div>
+
+      <button id="btnConfirmCreateRoom" class="btn-primary" style="width: 100%; margin-top: 14px;">
+        ✨ Criar Sala e Abrir Lobby
+      </button>
+    </div>
+  </div>
 
   <!-- MODAL: COMPARTILHAMENTO & QR CODE NATIVO -->
   <div id="shareModal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">

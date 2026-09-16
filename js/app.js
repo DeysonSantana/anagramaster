@@ -1,6 +1,6 @@
 /**
  * APP.JS - Orquestrador Central e Controlador da Aplicação (SPA)
- * Gerencia estados de tela, mecânica de montagem de letras, teclado, pontuação e ranking
+ * Integração de Auth Firebase, Salas Multiplayer, Dicionário, Teclado e Ranking
  */
 
 import { audio } from './audio.js';
@@ -9,6 +9,9 @@ import { AnagramEngine } from './anagramEngine.js';
 import { DictionaryManager, CATEGORIES } from './dictionary.js';
 import { ShareManager } from './shareManager.js';
 import { OfflineManager } from './offlineManager.js';
+import { AuthManager } from './authManager.js';
+import { LeaderboardManager } from './leaderboardManager.js';
+import { RoomManager } from './roomManager.js';
 
 class AnagramApp {
   constructor() {
@@ -30,22 +33,38 @@ class AnagramApp {
       creator: document.getElementById('creatorScreen'),
       game: document.getElementById('gameScreen'),
       gameOver: document.getElementById('gameOverScreen'),
-      ranking: document.getElementById('rankingScreen')
+      ranking: document.getElementById('rankingScreen'),
+      roomLobbyScreen: document.getElementById('roomLobbyScreen'),
+      roomPodiumScreen: document.getElementById('roomPodiumScreen')
     };
 
-    // Inicialização de Managers
+    // Managers
     this.offlineManager = new OfflineManager((msg, type) => this.showToast(msg, type));
+    this.authManager = new AuthManager(this, (msg, type) => this.showToast(msg, type));
+    this.leaderboardManager = new LeaderboardManager(this);
+    this.roomManager = new RoomManager(this, this.authManager, this.leaderboardManager, (msg, type) => this.showToast(msg, type));
   }
 
-  init() {
+  async init() {
     themeManager.init();
     this.offlineManager.init();
+    await this.authManager.init();
+    this.roomManager.init();
     this.setupGlobalEvents();
     this.setupThemeSelector();
     this.setupAudioToggle();
     this.loadRanking();
 
-    // Checagem de Desafio via URL Hash (#c=...)
+    // Checagem de Rotas por Hash (#room=... ou #c=...)
+    const hash = window.location.hash;
+    if (hash.startsWith('#room=')) {
+      const pin = hash.substring(6).trim();
+      if (pin) {
+        this.roomManager.joinRoom(pin);
+        return;
+      }
+    }
+
     const sharedChallenge = ShareManager.decodeFromHash();
     if (sharedChallenge) {
       this.showToast(`Desafio compartilhado por ${sharedChallenge.creator} recebido!`, 'success');
@@ -188,7 +207,7 @@ class AnagramApp {
       this.switchScreen('hub');
     });
 
-    // Criação de Desafio Personalizado
+    // Criação de Desafio Personalizado Solo
     document.getElementById('btnSubmitCreation')?.addEventListener('click', () => {
       this.handleCreateCustomChallenge();
     });
@@ -238,7 +257,7 @@ class AnagramApp {
       manualInput.addEventListener('keyup', (e) => e.key === 'Enter' && handleManual());
     }
 
-    // Modal de Compartilhamento
+    // Modal de Compartilhamento Solo
     document.getElementById('btnCloseShareModal')?.addEventListener('click', () => {
       ShareManager.closeShareModal();
     });
@@ -246,7 +265,7 @@ class AnagramApp {
       ShareManager.copyShareUrl((msg, type) => this.showToast(msg, type));
     });
 
-    // Fim de Jogo
+    // Fim de Jogo Solo
     document.getElementById('btnSaveRanking')?.addEventListener('click', () => {
       this.saveScore();
     });
@@ -262,9 +281,8 @@ class AnagramApp {
 
     // Teclado Físico para digitação direta
     window.addEventListener('keydown', (e) => {
-      // Apenas processa se a tela de jogo estiver ativa e o foco não estiver em um input
       if (this.screens.game.classList.contains('hidden')) return;
-      if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
+      if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'SELECT')) return;
 
       const key = e.key.toUpperCase();
       if (key === 'BACKSPACE') {
@@ -294,11 +312,12 @@ class AnagramApp {
       return;
     }
 
+    const defaultCreator = this.authManager.getDisplayName() || 'Criador';
     const challenge = {
       secretWord,
       hint1: hint1Input.value.trim() || 'Nenhuma dica fornecida.',
       hint2: hint2Input.value.trim() || 'Nenhuma dica fornecida.',
-      creator: creatorInput.value.trim() || 'Criador',
+      creator: creatorInput.value.trim() || defaultCreator,
       category: 'custom'
     };
 
@@ -306,7 +325,6 @@ class AnagramApp {
     this.showToast('Desafio criado com sucesso!', 'success');
     ShareManager.showShareModal(challenge);
 
-    // Limpar campos
     wordInput.value = '';
     hint1Input.value = '';
     hint2Input.value = '';
@@ -326,7 +344,9 @@ class AnagramApp {
     // Metadados da tela
     const catBadge = document.getElementById('gameCategoryBadge');
     if (catBadge) {
-      if (challenge.isDaily) {
+      if (challenge.isRoomMatch) {
+        catBadge.textContent = `👥 Sala #${challenge.roomPin}`;
+      } else if (challenge.isDaily) {
         catBadge.textContent = '📅 Desafio do Dia';
       } else if (challenge.category && CATEGORIES[challenge.category]) {
         catBadge.textContent = `${CATEGORIES[challenge.category].icon} ${CATEGORIES[challenge.category].label}`;
@@ -425,14 +445,12 @@ class AnagramApp {
     this.renderSlots();
     this.renderRack();
 
-    // Se completou todos os slots, valida automaticamente
     if (this.placedLetters.length === this.currentChallenge.secretWord.length) {
       setTimeout(() => this.verifyCurrentPlacedAnswer(), 120);
     }
   }
 
   placeLetterByKey(char) {
-    // Procura na rack uma letra disponível (com normalização de acentos)
     const normChar = AnagramEngine.normalize(char);
     const availableItem = this.rackLetters.find(item => 
       !item.used && AnagramEngine.normalize(item.letter) === normChar
@@ -474,13 +492,11 @@ class AnagramApp {
     const available = this.rackLetters.filter(i => !i.used);
     if (available.length <= 1) return;
 
-    // Fisher-Yates nas letras restantes
     for (let i = available.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [available[i], available[j]] = [available[j], available[i]];
     }
 
-    // Recompõe o array mantendo as usadas
     let availIdx = 0;
     this.rackLetters = this.rackLetters.map(item => {
       if (!item.used) {
@@ -547,6 +563,9 @@ class AnagramApp {
   endGame(status) {
     this.stopTimer();
 
+    const isRoom = !!this.currentChallenge?.isRoomMatch;
+    const roomPin = this.currentChallenge?.roomPin;
+
     const titleElem = document.getElementById('gameOverTitle');
     const msgElem = document.getElementById('gameOverMessage');
     const scoreElem = document.getElementById('finalScoreCounter');
@@ -573,8 +592,18 @@ class AnagramApp {
       audio.playTileReturn();
     }
 
+    // Se for partida multiplayer de sala, envia automaticamente a pontuação para a sala e abre o Pódio!
+    if (isRoom && roomPin) {
+      setTimeout(() => {
+        this.roomManager.submitScore(roomPin, this.finalScore, this.secondsElapsed);
+      }, 1200);
+      return;
+    }
+
     if (scoreElem) scoreElem.textContent = this.finalScore;
-    if (nameInput) nameInput.value = '';
+    if (nameInput) {
+      nameInput.value = this.authManager.getDisplayName();
+    }
     if (saveBtn) {
       saveBtn.disabled = this.finalScore === 0;
       saveBtn.textContent = 'Salvar no Ranking';
@@ -612,7 +641,6 @@ class AnagramApp {
 
         const spanName = document.createElement('span');
         spanName.className = 'ranking-name';
-        // Proteção estrita contra XSS: uso de textContent
         spanName.textContent = entry.name;
 
         const spanScore = document.createElement('span');
@@ -642,7 +670,7 @@ class AnagramApp {
 
     let ranking = JSON.parse(localStorage.getItem('anagram_ranking') || '[]');
     ranking.push({
-      name: name.substring(0, 15), // Limite de 15 caracteres
+      name: name.substring(0, 15),
       score: this.finalScore,
       date: new Date().toISOString()
     });
